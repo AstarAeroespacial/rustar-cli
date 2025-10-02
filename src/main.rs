@@ -1,9 +1,5 @@
 use crate::error::CliError;
 use clap::{Parser, Subcommand};
-use std::{
-    io::{Read, Write},
-    net::TcpStream,
-};
 use tracking::{Elements, Observer};
 mod error;
 
@@ -119,33 +115,4 @@ fn main() {
             std::process::exit(1);
         }
     };
-
-    match TcpStream::connect(("localhost", 9999)) {
-        Ok(mut stream) => {
-            if let Err(e) = stream.write_all(command.as_bytes()) {
-                eprintln!("Error sending command: {}", e);
-                std::process::exit(1);
-            }
-
-            let mut response = String::new();
-            match stream.read_to_string(&mut response) {
-                Ok(_) => {
-                    let response = response.trim();
-                    if !response.is_empty() {
-                        println!("{}", response);
-                    } else {
-                        println!("Command sent successfully");
-                    }
-                }
-                Err(e) => {
-                    eprintln!("Error reading response: {}", e);
-                    std::process::exit(1);
-                }
-            }
-        }
-        Err(e) => {
-            eprintln!("Error connecting to ground station: {}", e);
-            std::process::exit(1);
-        }
-    }
 }
